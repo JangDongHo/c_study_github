@@ -2,5 +2,6 @@
 
 int main()
 {
-	printf("����ȣ �ٺ�");
+	printf("¹èÁöÈ£ ¹Ùº¸");
+	printf("version2");
 }
