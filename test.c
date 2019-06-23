@@ -2,6 +2,7 @@
 
 int main()
 {
-	printf("¹èÁöÈ£ ¹Ùº¸");
+	printf("hi");
 	printf("version2");
+	printf("version3");
 }
