@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #define CREAM 500
 #define SAEWOO 700
 #define COKE 400
@@ -7,9 +7,8 @@ void main()
 {
 	int money;
 	int cr, sa, co;
-	int check = 0;
 
-	printf("ÇöÀç ´ç½ÅÀÌ ¼ÒÀ¯ÇÏ°í ÀÖ´Â ±İ¾× : ");
+	printf("ë‹¹ì‹ ì´ ê°€ì§€ê³  ìˆëŠ” ëˆ (ê·¸ì§€) : ");
 	scanf("%d", &money);
 
 	for (cr = 1; cr*CREAM < money; cr++)
@@ -18,15 +17,12 @@ void main()
 		{
 			for (co = 1; co*COKE < money; co++)
 			{
-				if ((cr * CREAM + sa * SAEWOO + co * COKE) == money)
+				if ((cr*CREAM + sa * SAEWOO + co * COKE) == money)
 				{
-					printf("Å©¸²»§ %d°³, »õ¿ì±ø %d°³, Äİ ¶ó %d°³\n", cr, sa, co);
-					co = 1;
+					printf("í¬ë¦¼ë¹µ %dê°œ, ìƒˆìš°ê¹¡ %dê°œ, ì½œ ë¼ %dê°œ\n", cr, sa, co);
 					break;
 				}
 			}
 		}
 	}
-
-
 }
