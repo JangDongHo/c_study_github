@@ -7,7 +7,7 @@ void main()
 {
 	int money;
 	int cr, sa, co;
-
+		
 	printf("당신이 가지고 있는 돈 (그지) : ");
 	scanf("%d", &money);
 
