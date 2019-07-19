@@ -28,6 +28,8 @@ void main()
 		// 결과를 처리하는 구문입니다.
 		check_win(player, computer, rate, &lose);
 	}
+	// 게임의 결과를 출력하는 구문입니다.
+	printf("게임의 결과: %d승, %d무", rate[0], rate[1]);
 }
 
 void print_choice(int player, int computer)
