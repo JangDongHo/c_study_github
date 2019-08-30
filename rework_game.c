@@ -14,7 +14,7 @@ typedef struct user
 int menu();	// 메뉴와 관련된 함수
 void register_login(USER user[10], int* index, int* player);	// 회원가입&로그인 함수
 void rate_user(USER user[10], int player, int index);	// 전적, 등수 함수
-//void main_game(USER user[10], int player);	// 게임 함수
+void main_game(USER user[10], int player);	// 게임 함수
 void file_load(FILE* fp, USER user[10], int* index);	// 파일 불러오기
 void file_save(USER user[10], int index);	// 파일 저장하기
 
@@ -53,7 +53,7 @@ int main()
 		switch ((menu()))
 		{
 		case 1: {register_login(user, &index, &player); break; }
-		//case 2: {game_user(user, player); break; }
+		case 2: {main_game(user, player); break; }
 		case 3: {rate_user(user, player, index); break; }
 		case 4: {file_save(user, index); return 0; }
 		}
@@ -63,9 +63,9 @@ int main()
 int menu()
 {
 	int select;
-	printf("■■■■■■■■■■■■■■■■■■■\n");
+	printf("★☆★☆★☆★☆★☆★☆★☆★☆★☆★\n");
 	printf("1. 회원가입&로그인\n2. 게임하기\n3. 전적&등수 확인\n4. 게임종료\n");
-	printf("■■■■■■■■■■■■■■■■■■■\n");
+	printf("★☆★☆★☆★☆★☆★☆★☆★☆★☆★\n");
 	scanf("%d", &select);
 	return select;
 }
@@ -99,41 +99,26 @@ void register_login(USER user[10], int* index, int* player)
 			int check;	// ID 인덱스 확인용 변수입니다.
 			int choice;
 
-			while (1)
+			check = -1;
+			printf("ID 입력: ");
+			scanf("%s", id);
+			printf("PW 입력: ");
+			scanf("%s", pw);
+			for (int i = 0; i < 10; i++)
 			{
-				check = -1;
-				// 로그인을 할 것인지, 메인메뉴로 나갈 것인지 물어봅니다.
-				printf("■■■■■■■■■■■■■■■■■■■\n");
-				printf("1. 로그인\n2. 메인메뉴\n");
-				printf("■■■■■■■■■■■■■■■■■■■\n");
-				scanf("%d", &choice);
-				//
-				if (choice == 1)
-				{
-					printf("ID 입력: ");
-					scanf("%s", id);
-					printf("PW 입력: ");
-					scanf("%s", pw);
-					for (int i = 0; i < 10; i++)
-					{
-						if (!strcmp(id, user[i].id))	// 아이디 존재 여부 확인
-							check = i;
-					}
-					if (check >= 0)	// 아이디가 존재할 경우
-					{
-						if (!strcmp(pw, user[check].pw))	// 비밀번호 일치여부 확인
-						{
-							printf("%s님 로그인 되었습니다.\n", user[check].name);
-							*player = check;
-						}
-						else
-							printf("비밀번호가 틀립니다.\n");
-					}
-					else
-						printf("존재하지 않는 아이디입니다.\n");
-				}
-				else break;
+				if (!strcmp(id, user[i].id))	// 아이디 존재 여부 확인
+					check = i;
 			}
+			if (check >= 0)	// 아이디가 존재할 경우
+			{
+				if (!strcmp(pw, user[check].pw))	// 비밀번호 일치여부 확인
+				{
+					printf("%s님 로그인 되었습니다.\n", user[check].name);
+					*player = check;
+				}
+				else printf("비밀번호가 틀립니다.\n");
+			}
+			else printf("존재하지 않는 아이디입니다.\n");
 		}
 		else break;
 	}
@@ -141,70 +126,110 @@ void register_login(USER user[10], int* index, int* player)
 
 void rate_user(USER user[10], int player, int index)
 {
-	int select;
+	// 전적&등수 구문입니다.
+	//등수를 계산하는 구문입니다.
+	int win_box[10];	// 첫번째부터 승리 횟수를 가져옵니다.
+	int index_box[10];	// 인덱스 저장용 배열입니다.
+			
+	// 유저수 만큼 인덱스를 0부터 오름차순으로 배열합니다.
+	for (int i = 0; i <= index; i++)
+		index_box[i] = i;
+
+	int temp, temp2;	// 교환하기 위한 임시 변수입니다.
+
+	// 인덱스순으로 승리 횟수를 배열합니다.
+	for (int i = 0; i <= index; i++)
+					win_box[i] = user[i].rate[0];
+			
+	// 인덱스 순으로 승리 횟수를 내림차순 합니다.
+	// 그리고 인덱스 저장용 배열도 같이 바꿔줍니다.
+
+	// 두개씩 비교해서 내림차순을 하는 방법을 이용했습니다.
+	for (int i = 0; i <= index - 1; i++)
+	{
+		for (int j = i + 1; j <= index; j++)
+		{
+			if (win_box[i] < win_box[j])
+			{
+				// 승리횟수 배열을 내림차순합니다.
+				temp = win_box[j];
+				win_box[j] = win_box[i];
+				win_box[i] = temp;
+
+				// 출력을 위해 인덱스 배열도 그에 따라 같이 재배열합니다.
+				temp2 = index_box[j];
+				index_box[j] = index_box[i];
+				index_box[i] = temp2;
+			}
+		}
+	}
+
+	printf("■■■■■■■■■■■■■■■■■■■\n");
+	// 로그인 상태라면 전적을 출력합니다.
+	if (player != -1)
+	{
+		printf("【 %s 님의 전적 】승: %d / 패: %d / 무: %d / 전: %d\n", user[player].name, user[player].rate[0], user[player].rate[1], user[player].rate[2], user[player].rate[3]);
+		printf("■■■■■■■■■■■■■■■■■■■\n");
+	}
+	// 순위를 출력합니다.
+	for (int i = 0; i <= index; i++)
+		printf("%2d.【 %s 】 승: %d / 패: %d / 무: %d / 전: %d\n", i + 1, user[index_box[i]].name, user[index_box[i]].rate[0], user[index_box[i]].rate[1], user[index_box[i]].rate[2], user[index_box[i]].rate[3]);
+	printf("■■■■■■■■■■■■■■■■■■■\n");
+}
+
+void main_game(USER user[10], int player)
+{
+	// 비로그인 일시 게임 시작을 막습니다.
+	if (player == -1)
+	{
+		printf("먼저 로그인을 해주세요.\n");
+		return 1;
+	}
+
+	srand((unsigned)time(NULL)); // 난수를 초기화합니다.
+	int com; // 컴퓨터가 무엇을 낼지 결정합니다.
+	int select;	// 플레이어가 무엇을 낼지 저장하는 변수입니다.
+	int result;	// 결과 유무를 저장하는 변수입니다.
+
+	//게임 구문입니다.
 	while (1)
 	{
-		// 비로그인 일시 반복문을 탈출합니다.
-		if (player == -1)
-		{
-			printf("먼저 로그인을 해주세요.\n");
-			break;
-		}
-		printf("■■■■■■■■■■■■■■■■■■■\n");
-		printf("1. 전적&등수 확인\n2. 메인메뉴\n");
-		printf("■■■■■■■■■■■■■■■■■■■\n");
+		com = 1 + rand() % 3;
+		printf("1.가위\n2.바위\n3.보\n");
 		scanf("%d", &select);
-		// 전적&등수 구문입니다.
-		if (select == 1)
+
+		// 결과를 확인하는 구문입니다. (result값 0=승, 1=패, 2=무 반환)
+		if (com == select)	// 같게 냈을 경우
+			result = 2;
+		else
 		{
-			//등수를 계산하는 구문입니다.
-			int win_box[10];	// 첫번째부터 승리 횟수를 가져옵니다.
-			int index_box[10];	// 인덱스 저장용 배열입니다.
-			
-			// 유저수 만큼 인덱스를 0부터 오름차순으로 배열합니다.
-			for (int i = 0; i <= index; i++)
-				index_box[i] = i;
-
-			int temp, temp2;	// 교환하기 위한 임시 변수입니다.
-
-			// 인덱스순으로 승리 횟수를 배열합니다.
-			for (int i = 0; i <= index; i++)
-							win_box[i] = user[i].rate[0];
-			
-			// 인덱스 순으로 승리 횟수를 내림차순 합니다.
-			// 그리고 인덱스 저장용 배열도 같이 바꿔줍니다.
-
-			// 두개씩 비교해서 내림차순을 하는 방법을 이용했습니다.
-			for (int i = 0; i <= index - 1; i++)
+			switch (com)
 			{
-				for (int j = i + 1; j <= index; j++)
-				{
-					if (win_box[i] < win_box[j])
-					{
-						// 승리횟수 배열을 내림차순합니다.
-						temp = win_box[j];
-						win_box[j] = win_box[i];
-						win_box[i] = temp;
-
-						// 출력을 위해 인덱스 배열도 그에 따라 같이 재배열합니다.
-						temp2 = index_box[j];
-						index_box[j] = index_box[i];
-						index_box[i] = temp2;
-					}
-				}
+			case 1: if (select == 2) result = 0;
+					else result = 1; break;
+			case 2: if (select == 3) result = 0;
+					else result = 1; break;
+			case 3: if (select == 1) result = 0;
+					else result = 1; break;
 			}
-			// 전적을 출력합니다.
-			printf("■■■■■■■■■■■■■■■■■■■\n");
-			printf("【 %s 님의 전적 】승: %d / 패: %d / 무: %d / 전: %d\n", user[player].name, user[player].rate[0], user[player].rate[1], user[player].rate[2], user[player].rate[3]);
-			printf("■■■■■■■■■■■■■■■■■■■\n");
-			// 순위를 출력합니다.
-			for (int i = 0; i <= index; i++)
-			{
-				printf("%2d.【 %s 】 승: %d / 패: %d / 무: %d / 전: %d\n", i + 1, user[index_box[i]].name, user[index_box[i]].rate[0], user[index_box[i]].rate[1], user[index_box[i]].rate[2], user[index_box[i]].rate[3]);
-			}
-			printf("■■■■■■■■■■■■■■■■■■■\n");
 		}
-		else break;
+		// 결과를 출력하는 구문입니다.
+		printf("COMPUTER vs %s / 당신은 ", user[player].name);
+		switch (result)
+		{
+		case 0: {printf("[승리] 하셨습니다!\n"); user[player].rate[0]++; break; }
+		case 1: {printf("[패배] 하셨습니다!\n"); user[player].rate[1]++; break; }
+		case 2: {printf("[비겼] 습니다!\n"); user[player].rate[2]++; break; }
+		}
+		user[player].rate[3]++;	// 승패무와 상관없이 전적을 1 올려줍니다.
+
+		int choice;
+		printf("■■■■■■■■■■■■■■■■■■■\n");
+		printf("1. 다시하기\n2. 메인메뉴\n");
+		printf("■■■■■■■■■■■■■■■■■■■\n");
+		scanf("%d", &choice);
+		if (choice != 1)
+			break;
 	}
 }
 
@@ -214,20 +239,14 @@ void file_load(FILE* fp, USER user[10], int* index)
 	//포인터를 시작점으로 지정합니다.
 	fseek(fp, 0, SEEK_SET);
 
-	while (!feof(fp))
+	while (1)
 	{
 		if (fread(&user[i], sizeof(USER), 1, fp) == 0)
 		{
-			--i;
+			--i; 
 			break;
 		}
-		else
-		{
-			i++;
-			fseek(fp, -1, SEEK_CUR);
-		}
-		// 파일의 끝인지 확인하기 위해 1byte만큼 읽었으므로
-		// 파일포인터를 다시 1byte만큼 앞으로 돌린다.
+		else i++;
 	}
 	printf("[TEST] 현재 인덱스값: %d\n", i);
 	*index = i;
